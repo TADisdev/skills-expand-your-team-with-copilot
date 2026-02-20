@@ -519,6 +519,15 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Build share URLs for social sharing
+    const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    const shareText = `Check out ${name} at Mergington High School! ${details.description}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    const emailSubject = encodeURIComponent(`Check out: ${name}`);
+    const emailBody = encodeURIComponent(`${shareText}\n\nSchedule: ${formattedSchedule}\n\nLearn more at: ${shareUrl}`);
+    const emailUrl = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
@@ -568,6 +577,13 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <div class="share-buttons">
+          <span class="share-label">Share:</span>
+          <a href="${twitterUrl}" class="share-btn share-twitter" title="Share on X (Twitter)" aria-label="Share on X (Twitter)" target="_blank" rel="noopener noreferrer">𝕏</a>
+          <a href="${facebookUrl}" class="share-btn share-facebook" title="Share on Facebook" aria-label="Share on Facebook" target="_blank" rel="noopener noreferrer">f</a>
+          <a href="${emailUrl}" class="share-btn share-email" title="Share via Email" aria-label="Share via Email">✉</a>
+          <button class="share-btn share-copy" title="Copy link" aria-label="Copy link" data-activity="${name}">🔗</button>
+        </div>
       </div>
     `;
 
@@ -586,6 +602,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for copy link button
+    const copyButton = activityCard.querySelector(".share-copy");
+    copyButton.addEventListener("click", () => {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          copyButton.textContent = "✓";
+          setTimeout(() => {
+            copyButton.textContent = "🔗";
+          }, 2000);
+        }).catch(() => {
+          showMessage("Could not copy link. Please copy the URL manually.", "error");
+        });
+      } else {
+        showMessage("Copy not supported in this browser. Please copy the URL manually.", "error");
+      }
+    });
 
     activitiesList.appendChild(activityCard);
   }
